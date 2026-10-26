@@ -1,206 +1,194 @@
-import React, { useState, useEffect } from 'react'
-import { ThemeProvider, useTheme } from './context/ThemeContext'
-import { ToastProvider, useToast } from './context/ToastContext'
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { ThemeProvider } from './context/ThemeContext'
+import { ToastProvider } from './context/ToastContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
-import Card, { CardTitle, CardDescription } from './components/ui/Card'
+import OfflineBanner from './components/ui/OfflineBanner'
+import DemoBanner from './components/ui/DemoBanner'
+import Card from './components/ui/Card'
 import Button from './components/ui/Button'
 import Badge from './components/ui/Badge'
-import UrgencyBadge from './components/ui/UrgencyBadge'
-import { CardSkeleton } from './components/ui/Skeleton'
-import ErrorMessage from './components/ui/ErrorMessage'
-import DemoBanner from './components/ui/DemoBanner'
-import OfflineBanner from './components/ui/OfflineBanner'
-import { foodService } from './api/foodService'
-import { statsService } from './api/statsService'
-import { authService } from './api/authService'
-import { Database, Sparkles, Filter, CheckCircle2, MapPin } from 'lucide-react'
+import AppRoutes from './routes/AppRoutes'
+import { Shield, UserCheck, Lock, ArrowRight, Utensils, HeartHandshake, ShieldAlert } from 'lucide-react'
 
-function ApiLayerPlayground() {
-  const { addToast } = useToast()
+function AuthPlaygroundHome() {
+  const { user, isAuthenticated, logout } = useAuth()
 
-  // State for live API data
-  const [foods, setFoods] = useState([])
-  const [stats, setStats] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [categoryFilter, setCategoryFilter] = useState('All')
-  const [currentUser, setCurrentUser] = useState(null)
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      
+      {/* Phase 4 Header */}
+      <section className="bg-gradient-to-r from-brand-600 to-brand-700 text-white rounded-3xl p-8 shadow-soft relative overflow-hidden">
+        <div className="relative z-10 max-w-2xl space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-md">
+            <Shield className="w-3.5 h-3.5 text-accent-300" />
+            <span>Phase 4: Authentication & Route Protection</span>
+          </div>
+          <h1 className="text-3xl font-heading font-extrabold tracking-tight">
+            Role-Based Authentication
+          </h1>
+          <p className="text-brand-100 text-sm leading-relaxed">
+            Multi-role registration, login with client-side validation, password reveal toggle, in-memory auth state,
+            and strict <code>ProtectedRoute</code> &amp; <code>RoleRoute</code> guards.
+          </p>
+        </div>
+      </section>
 
-  const categories = ['All', 'Bakery', 'Prepared Meals', 'Produce', 'Dairy']
+      {/* Active Session Status Box */}
+      <Card className="p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg uppercase shadow-sm ${
+              isAuthenticated
+                ? 'bg-brand-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+            }`}>
+              {user?.name ? user.name[0] : 'G'}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-heading font-bold text-charcoal dark:text-cream-50">
+                  {isAuthenticated ? user.name : 'Guest User'}
+                </h3>
+                <Badge status={isAuthenticated ? 'Available' : 'Expired'} size="sm">
+                  {isAuthenticated ? `ROLE: ${user.role.toUpperCase()}` : 'NOT SIGNED IN'}
+                </Badge>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                {isAuthenticated
+                  ? `Authenticated as ${user.email} (${user.organizationName || 'Individual'})`
+                  : 'You are browsing as an unauthenticated guest. Sign in to test protected portals.'}
+              </p>
+            </div>
+          </div>
 
-  const loadData = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const [foodsResponse, statsResponse, meResponse] = await Promise.all([
-        foodService.getFoods({ category: categoryFilter }),
-        statsService.getOverview(),
-        authService.getMe()
-      ])
-      setFoods(foodsResponse.items || [])
-      setStats(statsResponse)
-      setCurrentUser(meResponse.user)
-    } catch (err) {
-      setError(err.message || 'Failed to fetch API data')
-    } finally {
-      setLoading(false)
-    }
-  }
+          <div className="flex gap-2">
+            {isAuthenticated ? (
+              <Button variant="danger" size="sm" onClick={logout}>
+                Log Out
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Link to="/login">
+                  <Button variant="outline" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="primary" size="sm">
+                    Register New Account
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </Card>
 
-  useEffect(() => {
-    loadData()
-  }, [categoryFilter])
+      {/* Route Guard Verification Testing Grid */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-heading font-bold">Interactive Route Guard Testing</h2>
+          <span className="text-xs text-gray-500">Click below to test protected paths</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Donor Route Card */}
+          <Card className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-brand-100 dark:bg-brand-950 text-brand-600 dark:text-brand-400">
+                <Utensils className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-charcoal dark:text-cream-50">Donor / Restaurant Route</h3>
+                <span className="text-[11px] text-gray-500">Path: <code>/donor/donations</code></span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+              Guards listings creation and donor inventory. Only accessible by <code>restaurant</code> or <code>donor</code> roles.
+            </p>
+            <Link to="/donor/donations" className="block">
+              <Button variant="outline" size="sm" className="w-full" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+                Test Donor Guard
+              </Button>
+            </Link>
+          </Card>
+
+          {/* Receiver Route Card */}
+          <Card className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+                <HeartHandshake className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-charcoal dark:text-cream-50">NGO / Receiver Route</h3>
+                <span className="text-[11px] text-gray-500">Path: <code>/receiver/requests</code></span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+              Guards collection requests history and status confirmation. Only accessible by <code>receiver</code> or <code>ngo</code>.
+            </p>
+            <Link to="/receiver/requests" className="block">
+              <Button variant="outline" size="sm" className="w-full" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+                Test Receiver Guard
+              </Button>
+            </Link>
+          </Card>
+
+          {/* Admin Route Card */}
+          <Card className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400">
+                <ShieldAlert className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-charcoal dark:text-cream-50">Admin Moderation Route</h3>
+                <span className="text-[11px] text-gray-500">Path: <code>/admin</code></span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+              Guards platform user moderation, listing take-down, and dispute resolution. Only accessible by <code>admin</code>.
+            </p>
+            <Link to="/admin" className="block">
+              <Button variant="outline" size="sm" className="w-full" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+                Test Admin Guard
+              </Button>
+            </Link>
+          </Card>
+
+        </div>
+      </section>
+
+      {/* Security Best Practices Reminder */}
+      <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 rounded-2xl text-xs text-amber-800 dark:text-amber-300 flex items-start gap-3">
+        <Lock className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" />
+        <div className="space-y-1">
+          <p className="font-bold">Frontend Security Notice for Developers:</p>
+          <p className="leading-relaxed">
+            Tokens are held strictly in application memory. No passwords or secret keys exist in the frontend code.
+            Client route guards provide clean UX, but the backend is the real authority for database and API permission enforcement.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  )
+}
+
+function MainLayout() {
+  const { user, logout } = useAuth()
 
   return (
     <div className="min-h-screen flex flex-col bg-cream-100 dark:bg-charcoal-dark text-charcoal dark:text-cream-50 transition-colors">
       <OfflineBanner />
       <DemoBanner />
-
-      <Navbar
-        user={currentUser}
-        onLogout={() => {
-          authService.logout()
-          setCurrentUser(null)
-          addToast({ type: 'info', title: 'Logged Out', message: 'Signed out of session.' })
-        }}
-      />
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        
-        {/* Phase 3 Banner */}
-        <section className="bg-gradient-to-r from-brand-600 to-brand-700 text-white rounded-3xl p-8 shadow-soft relative overflow-hidden">
-          <div className="relative z-10 max-w-2xl space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-md">
-              <Database className="w-3.5 h-3.5 text-accent-300" />
-              <span>Phase 3: Central API Client, Contract & Mock Switch</span>
-            </div>
-            <h1 className="text-3xl font-heading font-extrabold tracking-tight">
-              Decoupled API Architecture
-            </h1>
-            <p className="text-brand-100 text-sm leading-relaxed">
-              Every request routes through <code>src/api/endpoints.js</code> and service modules. When
-              <code>VITE_USE_MOCKS=true</code> is set, mock delay simulators serve contract-adherent data without touching real backend services.
-            </p>
-          </div>
-        </section>
-
-        {/* Live Counters fetched from statsService */}
-        {stats && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-5 bg-white dark:bg-charcoal rounded-2xl border border-brand-100 dark:border-gray-800 shadow-soft">
-              <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider block">Meals Saved</span>
-              <span className="text-2xl sm:text-3xl font-heading font-extrabold text-brand-600 mt-1 block">
-                {stats.mealsSaved.toLocaleString()}+
-              </span>
-            </div>
-            <div className="p-5 bg-white dark:bg-charcoal rounded-2xl border border-brand-100 dark:border-gray-800 shadow-soft">
-              <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider block">Food Rescued</span>
-              <span className="text-2xl sm:text-3xl font-heading font-extrabold text-brand-600 mt-1 block">
-                {stats.kgFoodSaved.toLocaleString()} kg
-              </span>
-            </div>
-            <div className="p-5 bg-white dark:bg-charcoal rounded-2xl border border-brand-100 dark:border-gray-800 shadow-soft">
-              <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider block">CO2 Avoided</span>
-              <span className="text-2xl sm:text-3xl font-heading font-extrabold text-accent-500 mt-1 block">
-                {stats.co2AvoidedKg.toLocaleString()} kg
-              </span>
-            </div>
-            <div className="p-5 bg-white dark:bg-charcoal rounded-2xl border border-brand-100 dark:border-gray-800 shadow-soft">
-              <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider block">Active Donors</span>
-              <span className="text-2xl sm:text-3xl font-heading font-extrabold text-charcoal dark:text-cream-50 mt-1 block">
-                {stats.activeDonors}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Filter Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-500" />
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Filter By Category:</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setCategoryFilter(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                  categoryFilter === cat
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'bg-white dark:bg-charcoal text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Food Listings Feed */}
-        {error && (
-          <ErrorMessage
-            title="Unable to load food listings"
-            message={error}
-            onRetry={loadData}
-          />
-        )}
-
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <CardSkeleton />
-            <CardSkeleton />
-            <CardSkeleton />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {foods.map((food) => (
-              <Card key={food.id} hoverEffect className="flex flex-col justify-between overflow-hidden p-0">
-                <div className="relative h-44 w-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                  <img
-                    src={food.imageUrl}
-                    alt={food.title}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute top-3 left-3 flex gap-2">
-                    <Badge status={food.status} />
-                  </div>
-                  <div className="absolute top-3 right-3 bg-white/90 dark:bg-charcoal/90 backdrop-blur-md rounded-full px-2.5 py-0.5 shadow-sm">
-                    <UrgencyBadge expiryTime={food.expiryTime} />
-                  </div>
-                </div>
-
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-                  <div>
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                      <span className="font-semibold text-brand-600 dark:text-brand-400">{food.category}</span>
-                      <span>{food.quantity} {food.unit}</span>
-                    </div>
-                    <h3 className="font-heading font-bold text-base line-clamp-1 text-charcoal dark:text-cream-50">
-                      {food.title}
-                    </h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 mt-1 leading-relaxed">
-                      {food.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between text-xs text-gray-500">
-                    <div className="flex items-center gap-1.5 truncate">
-                      <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                      <span className="truncate">{food.pickupLocation}</span>
-                    </div>
-                    <span className="font-semibold text-charcoal dark:text-cream-50 shrink-0">
-                      ★ {food.donor?.rating || '5.0'}
-                    </span>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-
+      <Navbar user={user} onLogout={logout} />
+      
+      <main className="flex-1">
+        <AppRoutes defaultHomeComponent={<AuthPlaygroundHome />} />
       </main>
 
       <Footer />
@@ -212,7 +200,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
-        <ApiLayerPlayground />
+        <AuthProvider>
+          <MainLayout />
+        </AuthProvider>
       </ToastProvider>
     </ThemeProvider>
   )
