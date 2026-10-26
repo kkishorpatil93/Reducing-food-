@@ -1,6 +1,8 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import HomePage from '../pages/public/HomePage'
+import BrowseFoodPage from '../pages/public/BrowseFoodPage'
+import FoodDetailsPage from '../pages/public/FoodDetailsPage'
 import LoginPage from '../pages/auth/LoginPage'
 import RegisterPage from '../pages/auth/RegisterPage'
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage'
@@ -94,6 +96,8 @@ export default function AppRoutes() {
     <Routes>
       {/* Public Pages */}
       <Route path="/" element={<HomePage />} />
+      <Route path="/browse" element={<BrowseFoodPage />} />
+      <Route path="/foods/:id" element={<FoodDetailsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
