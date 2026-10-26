@@ -2,6 +2,7 @@ import React from 'react'
 import { ThemeProvider } from './context/ThemeContext'
 import { ToastProvider } from './context/ToastContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { NotificationProvider } from './context/NotificationContext'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import OfflineBanner from './components/ui/OfflineBanner'
@@ -31,7 +32,9 @@ export default function App() {
     <ThemeProvider>
       <ToastProvider>
         <AuthProvider>
-          <MainLayout />
+          <NotificationProvider>
+            <MainLayout />
+          </NotificationProvider>
         </AuthProvider>
       </ToastProvider>
     </ThemeProvider>
