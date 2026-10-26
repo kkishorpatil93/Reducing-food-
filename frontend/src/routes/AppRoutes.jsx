@@ -1,5 +1,6 @@
 import React from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
+import HomePage from '../pages/public/HomePage'
 import LoginPage from '../pages/auth/LoginPage'
 import RegisterPage from '../pages/auth/RegisterPage'
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage'
@@ -11,7 +12,7 @@ import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import { useAuth } from '../hooks/useAuth'
 
-// Phase 4 Test Dashboard Placeholders for verifying Route Guards
+// Phase Placeholders for verifying Route Guards
 function DonorDashboardPlaceholder() {
   const { user } = useAuth()
   return (
@@ -23,7 +24,6 @@ function DonorDashboardPlaceholder() {
         </div>
         <p className="text-xs text-gray-500 mb-4">
           This route is restricted strictly to users with <strong>donor</strong> or <strong>restaurant</strong> roles.
-          Unauthorized users are blocked by <code>RoleRoute</code>.
         </p>
         <div className="p-4 bg-brand-50 dark:bg-brand-950/40 rounded-xl text-xs text-brand-800 dark:text-brand-300 font-medium">
           ✓ Guard verified: Only donors/restaurants can access this panel. Full "Add Food" builder will land in Phase 6.
@@ -88,11 +88,11 @@ function NotFoundPage() {
   )
 }
 
-export default function AppRoutes({ defaultHomeComponent }) {
+export default function AppRoutes() {
   return (
     <Routes>
       {/* Public Pages */}
-      <Route path="/" element={defaultHomeComponent} />
+      <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
