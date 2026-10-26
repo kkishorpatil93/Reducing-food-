@@ -3,13 +3,14 @@
 > **Database Role Reference Guide**  
 > **Database Engine:** SQLite (Native `node:sqlite` via WAL mode)  
 > **Schema File:** [`server/schema.sql`](file:///C:/Users/TUF%20A15%20HN007WS/.gemini/antigravity/scratch/foodbridge-ai/server/schema.sql)  
-> **Connection Entry:** [`server/db.js`](file:///C:/Users/TUF%20A15%20HN007WS/.gemini/antigravity/scratch/foodbridge-ai/server/db.js)
+> **Connection Entry:** [`server/db.js`](file:///C:/Users/TUF%20A15%20HN007WS/.gemini/antigravity/scratch/foodbridge-ai/server/db.js)  
+> **AI Prediction Module:** [`server/ai/prediction.js`](file:///C:/Users/TUF%20A15%20HN007WS/.gemini/antigravity/scratch/foodbridge-ai/server/ai/prediction.js)
 
 ---
 
 ## 1. Entity-Relationship (ER) Diagram
 
-The diagram below illustrates how all 7 tables connect through Primary Keys (`PK`) and Foreign Keys (`FK`):
+The diagram below illustrates how all 8 tables connect through Primary Keys (`PK`) and Foreign Keys (`FK`):
 
 ```mermaid
 erDiagram
@@ -20,6 +21,7 @@ erDiagram
     USERS ||--o{ REPORTS : "files"
     DONATIONS ||--o{ PICKUPS : "assigned to"
     DONATIONS ||--o{ REPORTS : "referenced in"
+    DONATIONS ||--o{ AI_PREDICTIONS : "analyzed by AI"
     NGOS ||--o{ PICKUPS : "receives delivery"
 
     USERS {
@@ -126,6 +128,20 @@ erDiagram
         int total_ngos
         float waste_reduced_tonnes
     }
+
+    AI_PREDICTIONS {
+        string id PK
+        string donation_id FK
+        string food_category
+        string storage_condition
+        float predicted_shelf_life_hours
+        float spoilage_risk_score
+        string risk_level
+        string recommended_action
+        float co2_diverted_kg
+        float confidence_score
+        string created_at
+    }
 ```
 
 ---
@@ -226,7 +242,26 @@ Charity and hunger-relief distributions.
 
 ---
 
-### 2.5. `notifications`, `reports`, and `impact_stats`
+### 2.5. `ai_predictions` Table (New - AI Food Spoilage & Waste Reduction)
+Stores AI analysis results for shelf life, spoilage probabilities, and carbon diversion metrics.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | TEXT | PRIMARY KEY | Unique prediction ID (`'pred-a1b2c3d4'`) |
+| `donation_id` | TEXT | NULLABLE, FK(`donations.id`) | Linked donation listing |
+| `food_category` | TEXT | NOT NULL | Normalized category (`'cooked'`, `'dairy'`, etc.) |
+| `storage_condition` | TEXT | NOT NULL | `'ambient'`, `'refrigerated'`, `'frozen'` |
+| `predicted_shelf_life_hours` | REAL | NOT NULL | Hours remaining before microbial spoilage risk exceeds 50% |
+| `spoilage_risk_score` | REAL | NOT NULL | Probability of spoilage ($0.00$ to $1.00$) |
+| `risk_level` | TEXT | NOT NULL | `'low'`, `'moderate'`, `'high'`, `'critical'` |
+| `recommended_action` | TEXT | NOT NULL | Actionable advice for dispatch & couriers |
+| `co2_diverted_kg` | REAL | NOT NULL | Estimated CO2 emissions avoided by rescue ($2.5 \times \text{kg}$) |
+| `confidence_score` | REAL | DEFAULT 0.90 | AI model confidence rating |
+| `created_at` | TEXT | NOT NULL | ISO 8601 prediction timestamp |
+
+---
+
+### 2.6. `notifications`, `reports`, and `impact_stats`
 * **`notifications`**: System alerts (`recipient_id`, `message`, `type`, `read`, `created_at`).
 * **`reports`**: Safety flags, spoilages, or disputes (`reporter_id`, `donation_id`, `reason`, `status`).
 * **`impact_stats`**: High-level impact summary row (`total_kg_rescued`, `total_meals_served`, `total_pickups`, `total_volunteers`, `total_ngos`, `waste_reduced_tonnes`).
@@ -300,6 +335,23 @@ WHERE verified = 1
 ORDER BY remaining_capacity DESC;
 ```
 
+### Recipe 6: Retrieve AI Waste & Spoilage Prediction for a Donation
+```sql
+SELECT 
+  d.id AS donation_id,
+  d.food_name,
+  d.qty_kg,
+  p.predicted_shelf_life_hours,
+  p.spoilage_risk_score,
+  p.risk_level,
+  p.recommended_action,
+  p.co2_diverted_kg,
+  p.confidence_score
+FROM donations d
+JOIN ai_predictions p ON d.id = p.donation_id
+WHERE d.id = ?;
+```
+
 ---
 
 ## 4. Query Performance & Indexes
@@ -311,3 +363,5 @@ To keep query response times under **10 milliseconds** even with thousands of li
 * `idx_pickups_donation_id`: Quick lookup for active delivery tracking
 * `idx_pickups_volunteer_id`: Fast query for a courier's assigned deliveries
 * `idx_notifications_recipient`: Instant unread badge counting (`WHERE recipient_id = ? AND read = 0`)
+* `idx_ai_predictions_donation`: Instant AI freshness report retrieval per donation
+* `idx_ai_predictions_risk`: Fast filtering of donations at `'critical'` or `'high'` waste risk

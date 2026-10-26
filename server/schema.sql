@@ -150,6 +150,25 @@ CREATE TABLE IF NOT EXISTS impact_stats (
 );
 
 -- ----------------------------------------------------------------------------
+-- 8. AI_PREDICTIONS TABLE (AI Waste Reduction & Spoilage Forecasts)
+-- Stores AI predictions for food freshness, remaining shelf-life, and waste risk.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS ai_predictions (
+  id TEXT PRIMARY KEY,                          -- Prediction record identifier (e.g., 'pred-101')
+  donation_id TEXT,                             -- Linked food donation (nullable for pre-checks)
+  food_category TEXT NOT NULL,                  -- 'cooked', 'bakery', 'dairy', 'raw_produce', etc.
+  storage_condition TEXT NOT NULL,              -- 'ambient', 'refrigerated', 'frozen'
+  predicted_shelf_life_hours REAL NOT NULL,     -- Hours remaining before spoilage risk > 50%
+  spoilage_risk_score REAL NOT NULL,            -- Spoilage probability score (0.00 to 1.00)
+  risk_level TEXT NOT NULL,                     -- 'low', 'moderate', 'high', 'critical'
+  recommended_action TEXT NOT NULL,             -- Recommended operational action
+  co2_diverted_kg REAL NOT NULL,                -- Carbon emissions avoided if rescued (kg)
+  confidence_score REAL DEFAULT 0.90,           -- Model confidence level (0.00 to 1.00)
+  created_at TEXT NOT NULL,                     -- Timestamp prediction was generated
+  FOREIGN KEY(donation_id) REFERENCES donations(id) ON DELETE CASCADE
+);
+
+-- ----------------------------------------------------------------------------
 -- INDEXES FOR FAST QUERY PERFORMANCE
 -- Speeds up common searches by status, foreign keys, and recipient.
 -- ----------------------------------------------------------------------------
@@ -159,3 +178,5 @@ CREATE INDEX IF NOT EXISTS idx_pickups_donation_id ON pickups(donation_id);
 CREATE INDEX IF NOT EXISTS idx_pickups_volunteer_id ON pickups(volunteer_id);
 CREATE INDEX IF NOT EXISTS idx_pickups_ngo_id ON pickups(ngo_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_recipient ON notifications(recipient_id, read);
+CREATE INDEX IF NOT EXISTS idx_ai_predictions_donation ON ai_predictions(donation_id);
+CREATE INDEX IF NOT EXISTS idx_ai_predictions_risk ON ai_predictions(risk_level);
