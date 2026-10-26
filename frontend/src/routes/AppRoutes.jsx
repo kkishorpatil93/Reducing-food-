@@ -4,6 +4,7 @@ import HomePage from '../pages/public/HomePage'
 import BrowseFoodPage from '../pages/public/BrowseFoodPage'
 import FoodDetailsPage from '../pages/public/FoodDetailsPage'
 import NotificationsPage from '../pages/public/NotificationsPage'
+import StatisticsPage from '../pages/public/StatisticsPage'
 import LoginPage from '../pages/auth/LoginPage'
 import RegisterPage from '../pages/auth/RegisterPage'
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage'
@@ -60,6 +61,7 @@ export default function AppRoutes() {
       <Route path="/browse" element={<BrowseFoodPage />} />
       <Route path="/foods/:id" element={<FoodDetailsPage />} />
       <Route path="/notifications" element={<NotificationsPage />} />
+      <Route path="/statistics" element={<StatisticsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
