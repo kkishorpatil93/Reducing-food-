@@ -13,30 +13,11 @@ import DashboardPage from '../pages/dashboard/DashboardPage'
 import AddFoodPage from '../pages/donor/AddFoodPage'
 import MyDonationsPage from '../pages/donor/MyDonationsPage'
 import MyRequestsPage from '../pages/receiver/MyRequestsPage'
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage'
 import ProtectedRoute from './ProtectedRoute'
 import RoleRoute from './RoleRoute'
 import Card from '../components/ui/Card'
-import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
-import { useAuth } from '../hooks/useAuth'
-
-// Admin Placeholders for verifying Route Guards
-function AdminDashboardPlaceholder() {
-  const { user } = useAuth()
-  return (
-    <div className="max-w-4xl mx-auto p-6 space-y-4">
-      <Card>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-heading font-bold">Admin Moderation Queue</h2>
-          <Badge status="Collected">Authorized: {user?.role}</Badge>
-        </div>
-        <p className="text-xs text-gray-500 mb-4">
-          Platform moderation, user block/unblock, and disputes resolution panel. Lands in Phase 11.
-        </p>
-      </Card>
-    </div>
-  )
-}
 
 function NotFoundPage() {
   return (
@@ -84,9 +65,10 @@ export default function AppRoutes() {
 
         {/* Protected Admin Routes */}
         <Route element={<RoleRoute allowedRoles={['admin']} />}>
-          <Route path="/admin" element={<AdminDashboardPlaceholder />} />
-          <Route path="/admin/users" element={<AdminDashboardPlaceholder />} />
-          <Route path="/admin/reports" element={<AdminDashboardPlaceholder />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/users" element={<AdminDashboardPage />} />
+          <Route path="/admin/listings" element={<AdminDashboardPage />} />
+          <Route path="/admin/reports" element={<AdminDashboardPage />} />
         </Route>
       </Route>
 
