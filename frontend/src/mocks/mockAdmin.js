@@ -1,0 +1,103 @@
+/**
+ * Development Mock Admin Data
+ * ONLY active when VITE_USE_MOCKS=true
+ */
+
+export const MOCK_ADMIN_USERS = [
+  {
+    id: 'usr_admin_1',
+    name: 'Platform Administrator',
+    email: 'admin@foodsave.ai',
+    role: 'admin',
+    status: 'active',
+    joinedDate: '2025-01-01',
+    impactMeals: 0,
+    trustRating: 5.0,
+  },
+  {
+    id: 'usr_donor_1',
+    name: 'Green Bakery & Cafe',
+    email: 'donor@greenbakery.com',
+    role: 'restaurant',
+    status: 'active',
+    joinedDate: '2026-01-15',
+    impactMeals: 840,
+    trustRating: 4.9,
+  },
+  {
+    id: 'usr_donor_2',
+    name: 'Sunrise Organic Farm',
+    email: 'farm@sunrise.com',
+    role: 'donor',
+    status: 'active',
+    joinedDate: '2026-03-01',
+    impactMeals: 410,
+    trustRating: 4.8,
+  },
+  {
+    id: 'usr_ngo_1',
+    name: 'Food For All Community Care',
+    email: 'ngo@foodforall.org',
+    role: 'ngo',
+    status: 'active',
+    joinedDate: '2025-11-20',
+    impactMeals: 2150,
+    trustRating: 5.0,
+  },
+  {
+    id: 'usr_receiver_1',
+    name: 'City Youth Center',
+    email: 'receiver@cityyouth.org',
+    role: 'receiver',
+    status: 'active',
+    joinedDate: '2026-04-10',
+    impactMeals: 620,
+    trustRating: 4.7,
+  },
+  {
+    id: 'usr_flagged_1',
+    name: 'Sunset Buffet Express',
+    email: 'buffet@sunset.com',
+    role: 'restaurant',
+    status: 'blocked',
+    joinedDate: '2026-06-12',
+    impactMeals: 45,
+    trustRating: 2.3,
+  },
+]
+
+export const MOCK_REPORTS = [
+  {
+    id: 'rep_001',
+    reporterName: 'Sarah Jenkins (Food For All NGO)',
+    targetType: 'listing',
+    targetId: 'food_006',
+    targetTitle: 'Sandwich Platters (Assorted Deli)',
+    reason: 'Food safety temperature violation: platters left unrefrigerated past 4 hours.',
+    status: 'pending',
+    createdAt: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
+    resolutionNotes: null,
+  },
+  {
+    id: 'rep_002',
+    reporterName: 'Marco Rossi (Green Bakery)',
+    targetType: 'user',
+    targetId: 'usr_flagged_1',
+    targetTitle: 'Sunset Buffet Express',
+    reason: 'Repeated no-show for confirmed collection appointments without cancellation notice.',
+    status: 'resolved',
+    createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    resolutionNotes: 'Account temporarily suspended after investigation.',
+  },
+  {
+    id: 'rep_003',
+    reporterName: 'David Chen (Valley Green Co-op)',
+    targetType: 'listing',
+    targetId: 'food_008',
+    targetTitle: 'Mediterranean Pita Pockets',
+    reason: 'Inaccurate quantity description: donor listed 50 portions but only 14 were present.',
+    status: 'pending',
+    createdAt: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
+    resolutionNotes: null,
+  },
+]
