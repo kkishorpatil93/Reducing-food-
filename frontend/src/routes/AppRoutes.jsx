@@ -7,7 +7,10 @@ import LoginPage from '../pages/auth/LoginPage'
 import RegisterPage from '../pages/auth/RegisterPage'
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage'
 import UnauthorizedPage from '../pages/public/UnauthorizedPage'
+import DashboardPage from '../pages/dashboard/DashboardPage'
 import AddFoodPage from '../pages/donor/AddFoodPage'
+import MyDonationsPage from '../pages/donor/MyDonationsPage'
+import MyRequestsPage from '../pages/receiver/MyRequestsPage'
 import ProtectedRoute from './ProtectedRoute'
 import RoleRoute from './RoleRoute'
 import Card from '../components/ui/Card'
@@ -15,62 +18,19 @@ import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import { useAuth } from '../hooks/useAuth'
 
-// Phase Placeholders for verifying Route Guards
-function DonorDonationsPlaceholder() {
-  const { user } = useAuth()
-  return (
-    <div className="max-w-4xl mx-auto p-6 space-y-4">
-      <Card>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-heading font-bold">My Donations History</h2>
-          <Badge status="Available">Authorized: {user?.role}</Badge>
-        </div>
-        <p className="text-xs text-gray-500 mb-4">
-          View all active, completed, and cancelled donations created by <strong>{user?.name}</strong>.
-        </p>
-        <div className="p-4 bg-brand-50 dark:bg-brand-950/40 rounded-xl text-xs text-brand-800 dark:text-brand-300 font-medium">
-          Full My Donations table with status filters lands in Phase 8.
-        </div>
-      </Card>
-    </div>
-  )
-}
-
-function ReceiverDashboardPlaceholder() {
-  const { user } = useAuth()
-  return (
-    <div className="max-w-4xl mx-auto p-6 space-y-4">
-      <Card>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-heading font-bold">Receiver & NGO Portal (Protected Role Route)</h2>
-          <Badge status="Accepted">Authorized: {user?.role}</Badge>
-        </div>
-        <p className="text-xs text-gray-500 mb-4">
-          This route is restricted strictly to <strong>receiver</strong> and <strong>ngo</strong> roles.
-        </p>
-        <div className="p-4 bg-blue-50 dark:bg-blue-950/40 rounded-xl text-xs text-blue-800 dark:text-blue-300 font-medium">
-          ✓ Guard verified: Only verified community NGOs & receivers can request food here.
-        </div>
-      </Card>
-    </div>
-  )
-}
-
+// Admin Placeholders for verifying Route Guards
 function AdminDashboardPlaceholder() {
   const { user } = useAuth()
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-4">
       <Card>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-heading font-bold">Admin Moderation Queue (Protected Role Route)</h2>
+          <h2 className="text-xl font-heading font-bold">Admin Moderation Queue</h2>
           <Badge status="Collected">Authorized: {user?.role}</Badge>
         </div>
         <p className="text-xs text-gray-500 mb-4">
-          This route is restricted strictly to <strong>admin</strong> users.
+          Platform moderation, user block/unblock, and disputes resolution panel. Lands in Phase 11.
         </p>
-        <div className="p-4 bg-purple-50 dark:bg-purple-950/40 rounded-xl text-xs text-purple-800 dark:text-purple-300 font-medium">
-          ✓ Guard verified: Platform moderation, user suspension, and dispute resolution.
-        </div>
       </Card>
     </div>
   )
@@ -103,16 +63,19 @@ export default function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-      {/* Protected Donor & Restaurant Routes */}
+      {/* Protected General Dashboard */}
       <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
+
+        {/* Protected Donor & Restaurant Routes */}
         <Route element={<RoleRoute allowedRoles={['donor', 'restaurant']} />}>
           <Route path="/donor/add" element={<AddFoodPage />} />
-          <Route path="/donor/donations" element={<DonorDonationsPlaceholder />} />
+          <Route path="/donor/donations" element={<MyDonationsPage />} />
         </Route>
 
         {/* Protected Receiver & NGO Routes */}
         <Route element={<RoleRoute allowedRoles={['receiver', 'ngo']} />}>
-          <Route path="/receiver/requests" element={<ReceiverDashboardPlaceholder />} />
+          <Route path="/receiver/requests" element={<MyRequestsPage />} />
         </Route>
 
         {/* Protected Admin Routes */}
